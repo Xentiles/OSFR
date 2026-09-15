@@ -1,0 +1,19 @@
+{
+  "name": "OSFR.Tests.PlayMode",
+  "rootNamespace": "OSFR.Tests.PlayMode",
+  "references": [
+    "OSFR.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
