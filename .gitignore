@@ -92,6 +92,8 @@ crashlytics-build.properties
 InitTestScene*.unity*
 /Unity/TestResults/
 /Unity/CodeCoverage/
+/TestResults/
+/CodeCoverage/
 
 # OSFR-generated captures and analysis outputs
 /Captures/

@@ -66,6 +66,38 @@ namespace OSFR.Measurement
             return worldUnitsPerRenderPixel * renderDimension / outputDimension;
         }
 
+        /// <summary>
+        /// Calculates the principal axes of the 3D Jacobian formed by two neighboring
+        /// world-position differences. Inputs must already represent one output pixel.
+        /// </summary>
+        public static PixelFootprint FromWorldDerivatives(Vector3 dx, Vector3 dy)
+        {
+            if (!IsFinite(dx))
+            {
+                throw new ArgumentOutOfRangeException(nameof(dx), "The X derivative must be finite.");
+            }
+
+            if (!IsFinite(dy))
+            {
+                throw new ArgumentOutOfRangeException(nameof(dy), "The Y derivative must be finite.");
+            }
+
+            float a = Vector3.Dot(dx, dx);
+            float b = Vector3.Dot(dx, dy);
+            float c = Vector3.Dot(dy, dy);
+            float discriminant = Mathf.Sqrt(Mathf.Max(0.0f, (a - c) * (a - c) + 4.0f * b * b));
+            float lambdaMaximum = 0.5f * (a + c + discriminant);
+            float lambdaMinimum = 0.5f * (a + c - discriminant);
+            float major = Mathf.Sqrt(Mathf.Max(lambdaMaximum, 0.0f));
+            float minor = Mathf.Sqrt(Mathf.Max(lambdaMinimum, 0.0f));
+
+            return new PixelFootprint(
+                major,
+                minor,
+                Vector3.Cross(dx, dy).magnitude,
+                major / Mathf.Max(minor, 1e-6f));
+        }
+
         private static void ValidateProjectionInputs(
             float linearDepth,
             float verticalFieldOfViewDegrees,
@@ -93,6 +125,11 @@ namespace OSFR.Measurement
             {
                 throw new ArgumentOutOfRangeException(nameof(outputHeight));
             }
+        }
+
+        private static bool IsFinite(Vector3 value)
+        {
+            return float.IsFinite(value.x) && float.IsFinite(value.y) && float.IsFinite(value.z);
         }
     }
 }

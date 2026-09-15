@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using OSFR.Rendering;
 
 namespace OSFR.Editor
 {
@@ -40,9 +41,17 @@ namespace OSFR.Editor
                 isValid = false;
             }
 
+            ScriptableRendererData rendererData = AssetDatabase.LoadAssetAtPath<ScriptableRendererData>(
+                "Assets/Settings/PC_Renderer.asset");
+            if (rendererData == null || !rendererData.TryGetRendererFeature(out MeasurementRendererFeature _))
+            {
+                Debug.LogError("OSFR requires the V0 Measurement Renderer Feature on PC_Renderer.");
+                isValid = false;
+            }
+
             if (isValid && logSuccess)
             {
-                Debug.Log("OSFR project configuration is valid: Linear color space and URP are active.");
+                Debug.Log("OSFR project configuration is valid: Linear color space, URP, and the V0 measurement feature are active.");
             }
 
             return isValid;

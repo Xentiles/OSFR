@@ -2,7 +2,9 @@
   "name": "OSFR.Tests.PlayMode",
   "rootNamespace": "OSFR.Tests.PlayMode",
   "references": [
-    "OSFR.Runtime"
+    "OSFR.Runtime",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
