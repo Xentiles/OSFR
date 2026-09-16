@@ -143,15 +143,18 @@ namespace OSFR.Editor
 
                 stitched.Apply(false, false);
                 Color[] pixels = stitched.GetPixels();
-                byte[] exr = stitched.EncodeToEXR(
-                    Texture2D.EXRFlags.OutputAsFloat | Texture2D.EXRFlags.CompressZIP);
-                string outputDirectory = Path.GetDirectoryName(outputPath);
-                if (!string.IsNullOrEmpty(outputDirectory))
+                if (!string.IsNullOrEmpty(outputPath))
                 {
-                    Directory.CreateDirectory(outputDirectory);
-                }
+                    byte[] exr = stitched.EncodeToEXR(
+                        Texture2D.EXRFlags.OutputAsFloat | Texture2D.EXRFlags.CompressZIP);
+                    string outputDirectory = Path.GetDirectoryName(outputPath);
+                    if (!string.IsNullOrEmpty(outputDirectory))
+                    {
+                        Directory.CreateDirectory(outputDirectory);
+                    }
 
-                File.WriteAllBytes(outputPath, exr);
+                    File.WriteAllBytes(outputPath, exr);
+                }
                 stopwatch.Stop();
                 return new Result(
                     pixels,

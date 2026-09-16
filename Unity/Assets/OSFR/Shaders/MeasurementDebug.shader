@@ -20,6 +20,8 @@ Shader "Hidden/OSFR/MeasurementDebug"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
+            TEXTURE2D_X(_MotionVectorTexture);
+
             int _OSFRDebugMode;
             float4 _OSFRRenderSize;
             float4 _OSFROutputSize;
@@ -134,6 +136,17 @@ Shader "Hidden/OSFR/MeasurementDebug"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+
+                if (_OSFRDebugMode == 22)
+                {
+                    float2 motion = SAMPLE_TEXTURE2D_X_LOD(
+                        _MotionVectorTexture,
+                        sampler_PointClamp,
+                        uv,
+                        0).xy;
+                    return float4(motion, 0.0, 1.0);
+                }
+
                 float rawDepth = SampleSceneDepth(uv);
 
                 if (_OSFRDebugMode == 0)

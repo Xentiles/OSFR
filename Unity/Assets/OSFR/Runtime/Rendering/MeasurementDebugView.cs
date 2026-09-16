@@ -83,14 +83,21 @@ namespace OSFR.Rendering
         /// <summary>
         /// Joint bilateral support normalized by the spatial-only kernel sum.
         /// </summary>
-        BilateralWeightSum = 21
+        BilateralWeightSum = 21,
+
+        /// <summary>
+        /// Raw URP forward motion in screen UV units: R = horizontal UV motion,
+        /// G = vertical UV motion. Previous-frame UV is current UV minus RG.
+        /// </summary>
+        MotionVectorsData = 22
     }
 
     internal static class MeasurementDebugViewExtensions
     {
         public static bool IsFrequencyPyramidView(this MeasurementDebugView view)
         {
-            return view >= MeasurementDebugView.PyramidMip;
+            return view >= MeasurementDebugView.PyramidMip
+                && view <= MeasurementDebugView.BilateralWeightSum;
         }
 
         public static bool RequiresDepth(this MeasurementDebugView view)
@@ -100,7 +107,13 @@ namespace OSFR.Rendering
 
         public static bool RequiresNormals(this MeasurementDebugView view)
         {
-            return view >= MeasurementDebugView.BilateralFilteredColor;
+            return view >= MeasurementDebugView.BilateralFilteredColor
+                && view <= MeasurementDebugView.BilateralWeightSum;
+        }
+
+        public static bool RequiresMotion(this MeasurementDebugView view)
+        {
+            return view == MeasurementDebugView.MotionVectorsData;
         }
     }
 }

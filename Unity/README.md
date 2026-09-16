@@ -12,7 +12,7 @@ The Unity project is the V0/V1 research platform. It is intentionally kept separ
 - Color space: Linear
 - Render Graph compatibility mode: Disabled (Render Graph is active)
 
-## Current milestone: V1 frequency measurement
+## Current milestone: V1 temporal evaluation
 
 V0 establishes trustworthy measurements before adding any image filtering:
 
@@ -22,7 +22,7 @@ V0 establishes trustworthy measurements before adding any image filtering:
 4. Visualize footprint axes, area, and rejected discontinuities.
 5. Drive deterministic camera rails directly from frame index.
 
-The V0 exit criterion—agreement between measured and analytical planar footprint—is complete. V1 now adds a linear-HDR Gaussian pyramid and Laplacian fine-band energy diagnostics before any filtering policy is enabled.
+The V0 exit criterion—agreement between measured and analytical planar footprint—is complete. V1 now includes the linear-HDR pyramid, frequency-risk signal, promoted bilateral reconstruction preset, spatial reference metrics, deterministic temporal evaluation, and native SMAA/TAA/MSAA baselines. Bilateral satisfies the report's temporal/reference-error criterion relative to Raw and SMAA on the checkerboard case. The remaining V1 control is explicit TAA ghosting/disocclusion measurement at the depth boundary before the project advances to V2 upstream material filtering.
 
 ## Layout
 
@@ -48,6 +48,12 @@ The 720p spatial-metric run captures raw and bilateral outputs beside 8x and 16x
 
 The 720p parameter sweep searches 27 strength, spatial-sigma, and risk-range combinations against the 16x candidate reference. It retains all candidate EXRs and produces condition and Pareto-ranking CSVs with an explicit depth-boundary regression guard.
 
+The temporal runner adds a fast 24-frame smoke dataset and a complete 600-frame 720p checkerboard sequence. It uses static-scene world-position reprojection plus linear-depth disocclusion rejection to measure motion-compensated temporal delta error against a spatially supersampled reference, and records a project-specific 2–30 Hz residual spectrum. Generated sequences remain under workspace-level `Captures/V1` and are ignored by Git.
+
+The first 600-frame result reduced reference residual RMSE by 55.75%, motion-compensated temporal RMSE by 59.51%, and absolute 2–30 Hz residual-envelope power by 46.75% versus raw rendering. Total AC envelope power increased by 28.64%, so the evidence supports high-frequency stabilization specifically, not a blanket reduction in all temporal variation. The next V1 task is to put the same sequence evaluator around the native SMAA, TAA, and MSAA baselines.
+
+The native-AA matrix is now complete. Bilateral beats SMAA by 34.06% in spatial residual and 29.79% in motion-compensated tRMSE. Native TAA produces the best tRMSE, 17.03% below Bilateral, but has 24.74% higher spatial residual and 6.57x the 2–30 Hz residual-envelope power. MSAA 4x remains within 0.4% of Raw on the interior checkerboard, confirming that this case is material-frequency aliasing rather than coverage aliasing. The next remaining V1 control is a disocclusion/ghosting evaluation for TAA at the depth-boundary case.
+
 ## Command-line checks
 
 Run these commands from this directory:
@@ -57,6 +63,16 @@ unity -V
 unity status
 unity test . --mode EditMode --output TestResults/editmode.xml
 unity run . -- -executeMethod OSFR.Editor.V0CaptureMatrixRunner.RunSmokeFromCommandLine
+unity run . -- -executeMethod OSFR.Editor.V1TemporalMetricRunner.RunSmokeFromCommandLine
+```
+
+The native-AA runner must remain in Play Mode across real engine frames, so the CLI's `unity run` wrapper cannot launch it because that wrapper quits after the setup method returns. Invoke the pinned editor directly without `-quit`; the controller exits when capture finishes:
+
+```powershell
+& 'C:\Program Files\Unity\Hub\Editor\6000.3.24f1\Editor\Unity.exe' `
+  -batchmode -projectPath . `
+  -executeMethod OSFR.Editor.V1NativeAaBaselineRunner.RunSmokeFromCommandLine `
+  -logFile TestResults/native-aa-smoke.log
 ```
 
 Do not pass `-nographics` to capture commands: scientific EXR output requires a real graphics device, and the runner rejects Unity's Null Device.

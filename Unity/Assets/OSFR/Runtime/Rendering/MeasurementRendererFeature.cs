@@ -132,7 +132,8 @@ namespace OSFR.Rendering
                 m_Pass.Setup(
                     frequencyView,
                     m_Settings.debugView.RequiresDepth(),
-                    m_Settings.debugView.RequiresNormals());
+                    m_Settings.debugView.RequiresNormals(),
+                    m_Settings.debugView.RequiresMotion());
                 renderer.EnqueuePass(m_Pass);
             }
         }
@@ -181,6 +182,7 @@ namespace OSFR.Rendering
             private readonly Material m_Material;
             private readonly Material m_FrequencyMaterial;
             private bool m_UseFrequencyPyramid;
+            private bool m_RequiresMotion;
 
             public MeasurementPass(Settings settings, Material material, Material frequencyMaterial)
             {
@@ -189,9 +191,14 @@ namespace OSFR.Rendering
                 m_FrequencyMaterial = frequencyMaterial;
             }
 
-            public void Setup(bool useFrequencyPyramid, bool requiresDepth, bool requiresNormals)
+            public void Setup(
+                bool useFrequencyPyramid,
+                bool requiresDepth,
+                bool requiresNormals,
+                bool requiresMotion)
             {
                 m_UseFrequencyPyramid = useFrequencyPyramid;
+                m_RequiresMotion = requiresMotion;
                 requiresIntermediateTexture = useFrequencyPyramid;
                 ScriptableRenderPassInput input = ScriptableRenderPassInput.None;
                 if (!useFrequencyPyramid || requiresDepth)
@@ -202,6 +209,11 @@ namespace OSFR.Rendering
                 if (requiresNormals)
                 {
                     input |= ScriptableRenderPassInput.Normal;
+                }
+
+                if (requiresMotion)
+                {
+                    input |= ScriptableRenderPassInput.Motion;
                 }
 
                 ConfigureInput(input);
@@ -218,7 +230,9 @@ namespace OSFR.Rendering
                     return;
                 }
 
-                if (!resourceData.cameraDepthTexture.IsValid() || !resourceData.activeColorTexture.IsValid())
+                if (!resourceData.cameraDepthTexture.IsValid()
+                    || !resourceData.activeColorTexture.IsValid()
+                    || (m_RequiresMotion && !resourceData.motionVectorColor.IsValid()))
                 {
                     return;
                 }
@@ -247,6 +261,11 @@ namespace OSFR.Rendering
                     passData.worldPositionPeriod = Mathf.Max(0.0001f, m_Settings.worldPositionPeriod);
 
                     builder.UseTexture(resourceData.cameraDepthTexture, AccessFlags.Read);
+                    if (m_RequiresMotion)
+                    {
+                        builder.UseTexture(resourceData.motionVectorColor, AccessFlags.Read);
+                    }
+
                     builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
                     builder.SetRenderFunc(static (PassData data, RasterGraphContext context) => ExecutePass(data, context));
                 }
