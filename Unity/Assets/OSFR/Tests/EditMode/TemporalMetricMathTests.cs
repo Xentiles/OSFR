@@ -142,6 +142,87 @@ namespace OSFR.Tests.EditMode
             Assert.That(summary.ValidTemporalFraction, Is.EqualTo(0.5f));
         }
 
+        [Test]
+        public void DisocclusionAges_ClassifyOnlyNewlyRevealedFarSurface()
+        {
+            Color[] motion = Fill(2, Color.clear);
+            Color[] previousDepth =
+            {
+                new Color(5.0f, 0.0f, 0.0f, 1.0f),
+                new Color(10.0f, 0.0f, 0.0f, 1.0f)
+            };
+            Color[] currentDepth =
+            {
+                new Color(10.0f, 0.0f, 0.0f, 1.0f),
+                new Color(5.0f, 0.0f, 0.0f, 1.0f)
+            };
+
+            int[] ages = DisocclusionMetricMath.UpdateAges(
+                null, motion, previousDepth, currentDepth, 2, 1, 8);
+
+            Assert.That(ages[0], Is.EqualTo(0));
+            Assert.That(ages[1], Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void DisocclusionAges_PropagateAcrossDepthConsistentMotion()
+        {
+            int[] previousAges = { 2, -1 };
+            Color[] motion = Fill(2, Color.clear);
+            Color[] depth = Fill(2, new Color(10.0f, 0.0f, 0.0f, 1.0f));
+
+            int[] ages = DisocclusionMetricMath.UpdateAges(
+                previousAges, motion, depth, depth, 2, 1, 8);
+
+            Assert.That(ages[0], Is.EqualTo(3));
+            Assert.That(ages[1], Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void DisocclusionFrame_OldReferenceProducesUnitHistoryRetention()
+        {
+            Color[] candidate = { Color.white, Color.black };
+            Color[] currentReference = Fill(2, Color.black);
+            Color[] previousReference = { Color.white, Color.black };
+            Color[] motion = Fill(2, Color.clear);
+            int[] ages = { 0, -1 };
+
+            DisocclusionMetricMath.AgeBinResult[] result =
+                DisocclusionMetricMath.EvaluateFrame(
+                    candidate,
+                    currentReference,
+                    previousReference,
+                    motion,
+                    ages,
+                    2,
+                    1,
+                    8);
+
+            Assert.That(result[0].PixelCount, Is.EqualTo(1));
+            Assert.That(result[0].RootMeanSquareError, Is.EqualTo(1.0f).Within(0.000001f));
+            Assert.That(result[0].HistoryRetentionCoefficient, Is.EqualTo(1.0f).Within(0.000001f));
+            Assert.That(result[0].CloserToHistoryFraction, Is.EqualTo(1.0f));
+        }
+
+        [Test]
+        public void DisocclusionSequenceAccumulator_WeightsAgeBinsAndAllRecentPixels()
+        {
+            var accumulator = new DisocclusionMetricMath.SequenceAccumulator(1);
+            accumulator.Add(new[]
+            {
+                new DisocclusionMetricMath.AgeBinResult(0, 1, 1.0, 1.0, 1, 1.0, 1.0, 1),
+                new DisocclusionMetricMath.AgeBinResult(1, 3, 3.0, 3.0, 0, 0.0, 0.0, 0)
+            });
+
+            DisocclusionMetricMath.AgeBinResult[] bins = accumulator.BuildAgeSummary();
+            DisocclusionMetricMath.AgeBinResult all = accumulator.BuildAllRecentSummary();
+
+            Assert.That(bins[0].RootMeanSquareError, Is.EqualTo(1.0f));
+            Assert.That(bins[1].RootMeanSquareError, Is.EqualTo(1.0f));
+            Assert.That(all.PixelCount, Is.EqualTo(4));
+            Assert.That(all.RootMeanSquareError, Is.EqualTo(1.0f));
+        }
+
         private static Color[] Fill(int count, Color value)
         {
             var result = new Color[count];

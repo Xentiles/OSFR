@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/OSFR/Validation/Scenes/V1_ScreenSpaceValidation.unity
     guid: 52ca486c21d94bb4e9df4e3c9de38321
+  - enabled: 1
+    path: Assets/OSFR/Validation/Scenes/V2_UpstreamFiltering.unity
+    guid: 538ba1cdb0bb01b409c4235805047149
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
