@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible defect in OSFR tooling, rendering, or measurement.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping make OSFR more reliable. Please avoid attaching multi-gigabyte capture sets directly.
+  - type: input
+    id: revision
+    attributes:
+      label: Revision
+      description: Commit SHA or branch where the problem occurs.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Unity version, OS, GPU, graphics API, and driver.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Include the scene, menu/CLI entry point, and parameters.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and evidence
+      description: Include concise logs or metric rows and links to external evidence when needed.
+    validations:
+      required: true

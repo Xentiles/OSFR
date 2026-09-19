@@ -16,6 +16,10 @@ namespace OSFR.Tests.EditMode
             {
                 Assert.That(material.FindPass("DepthOnly"), Is.GreaterThanOrEqualTo(0));
                 Assert.That(material.FindPass("DepthNormalsOnly"), Is.GreaterThanOrEqualTo(0));
+                Assert.That(material.HasProperty("_FilterMode"), Is.True);
+                Assert.That(material.HasProperty("_LeanVarianceGain"), Is.True);
+                Assert.That(material.HasProperty("_LeanVisibilityMode"), Is.True);
+                Assert.That(material.HasProperty("_PatternAnisotropy"), Is.True);
             }
             finally
             {

@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
@@ -28,8 +28,12 @@ Material:
     - _BaseAlpha: 0.1
     - _DebugMode: 0
     - _FilterEnabled: 0
+    - _FilterMode: 0
+    - _LeanVarianceGain: 1
     - _NormalAmplitude: 0.9
     - _NormalFrequency: 16
+    - _PatternAngleDegrees: 35
+    - _PatternAnisotropy: 0
     - _VarianceGain: 64
     m_Colors:
     - _BaseColor: {r: 0.025, g: 0.025, b: 0.025, a: 1}

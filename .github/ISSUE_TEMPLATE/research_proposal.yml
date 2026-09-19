@@ -1,0 +1,41 @@
+name: Research proposal
+description: Propose an experiment, signal-class branch, or measurement improvement.
+title: "[Research]: "
+labels: [research]
+body:
+  - type: dropdown
+    id: signal
+    attributes:
+      label: Signal class
+      options:
+        - Measurement / reference
+        - Texture footprint
+        - Normal / NDF distribution
+        - Material frequency
+        - Geometry / coverage
+        - Residual spatial reconstruction
+        - Temporal reconstruction
+        - Cross-pipeline architecture
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: State a falsifiable claim rather than only an implementation idea.
+    validations:
+      required: true
+  - type: textarea
+    id: comparison
+    attributes:
+      label: Proposed comparison
+      description: Describe torture cases, baselines, reference policy, metrics, and rejection guards.
+    validations:
+      required: true
+  - type: textarea
+    id: pipeline
+    attributes:
+      label: Pipeline impact
+      description: Explain where this belongs in the output-aware pipeline and what existing failure it addresses.
+    validations:
+      required: true
